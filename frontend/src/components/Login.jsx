@@ -4,8 +4,10 @@ import { useRef } from 'react'
 import emailsvg from '../assets/email.svg'
 import show from '../assets/show.svg'
 import hide from '../assets/hide.svg'
+import { useNavigate } from 'react-router-dom'
 
-const Login = () => {
+const Login = ({sendResponse}) => {
+  const navigate = useNavigate()
   const inputRef1 = useRef(null)
   const inputRef2 = useRef(null)
   const pwdRef1 = useRef(null)
@@ -14,12 +16,31 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    watch,
+    setError,
     formState: { errors },
   } = useForm()
 
-  const onSubmit = (data) => {
-    console.log(data)
+  const onSubmit = async (data) => {
+    let response = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    
+    if(response.status === 400) {
+      let res = await response.text()
+      if(res == "Invalid email!")
+        setError('email', {message: res})
+      setError('password', {message: "Invalid password!"})
+      if(res == "Invalid password!")
+        setError('password', {message: res})
+    } else {
+      let res = await response.json()
+      sendResponse(res)
+      navigate("/")
+    }
   }
 
   const shiftlabel = (word) => {
@@ -56,7 +77,7 @@ const Login = () => {
 
           <div className='flex flex-col m-0'>
             <label htmlFor="pwd" className='absolute' ref={inputRef2}>Password</label>
-            <input id='pwd' type="password" {...register("password", { required: { value: true, message: "Fill this area first" }})} className='w-full border-b-2 outline-0' onClick={() => shiftlabel(inputRef2)} ref={(e) => {register("password").ref(e); pwdRef1.current = e;}} />
+            <input id='pwd' type="password" {...register("password", { required: { value: true, message: "Fill this area first" } })} className='w-full border-b-2 outline-0' onClick={() => shiftlabel(inputRef2)} ref={(e) => { register("password").ref(e); pwdRef1.current = e; }} />
             <img src={hide} className='w-5 invert self-end absolute' onClick={() => toggalpwd(pwdRef1, imgRef1)} ref={imgRef1} />
             {errors.password && <span className='text-red-500 text-xs'>{errors.password.message}</span>}
           </div>

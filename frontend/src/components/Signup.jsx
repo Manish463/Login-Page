@@ -5,8 +5,10 @@ import person from '../assets/person.svg'
 import emailsvg from '../assets/email.svg'
 import show from '../assets/show.svg'
 import hide from '../assets/hide.svg'
+import { useNavigate } from 'react-router-dom'
 
-function Signup() {
+function Signup({sendResponse}) {
+  const navigate = useNavigate()
   const inputRef1 = useRef(null)
   const inputRef2 = useRef(null)
   const inputRef3 = useRef(null)
@@ -20,11 +22,30 @@ function Signup() {
     register,
     handleSubmit,
     watch,
+    setError,
     formState: { errors },
   } = useForm()
 
-  const onSubmit = (data) => {
-    console.log(data)
+  const onSubmit = async (data) => {
+    if(data.password != data['confirm password']) {
+      alert(errors['confirm password'].message)
+      return
+    }
+    let response = await fetch('http://localhost:3000/signup', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    })
+
+    if(response.status === 400) {
+      setError('email', {message: 'Email already exists!'})
+    } else {
+      let res = await response.json()
+      sendResponse(res)
+      navigate("/")
+    }
   }
 
   const shiftlabel = (word) => {
@@ -64,13 +85,13 @@ function Signup() {
           </div>
           <div className='flex flex-col m-0'>
             <label htmlFor="pwd" className='absolute' ref={inputRef3}>Password</label>
-            <input id='pwd' type="password" {...register("password", {required: {value: true, message: "Fill this area first"}})}  className='w-full border-b-2 outline-0' onClick={() => shiftlabel(inputRef3)} ref={(e) => {register("password").ref(e); pwdRef1.current = e}} />
+            <input id='pwd' type="password" {...register("password", {required: {value: true, message: "Fill this area first"}, minLength: {value: 8, message: "The password should contains at least 8 charactors"}})}  className='w-full border-b-2 outline-0' onClick={() => shiftlabel(inputRef3)} ref={(e) => {register("password").ref(e); pwdRef1.current = e}} />
             <img src={hide} className='w-5 invert self-end absolute' onClick={() => toggalpwd(pwdRef1, imgRef1)} ref={imgRef1} />
             {errors.password && <span className='text-red-500 text-xs'>{errors.password.message}</span>}
           </div>
           <div className='flex flex-col m-0'>
             <label htmlFor="new-pwd" className='absolute' ref={inputRef4}>Confirm Password</label>
-            <input id='new-pwd' type="password" {...register("confirm password", {required: {value: true, message: "Fill this area first"}})} className='w-full border-b-2 outline-0' onClick={() => shiftlabel(inputRef4)} ref={(e) => {register("confirm password").ref(e); pwdRef2.current = e}} />
+            <input id='new-pwd' type="password" {...register("confirm password", {required: {value: true, message: "Fill this area first"}, validate : (value) => value === watch("password") || "Your password and confirm password must be the same."})} className='w-full border-b-2 outline-0' onClick={() => shiftlabel(inputRef4)} ref={(e) => {register("confirm password").ref(e); pwdRef2.current = e}} />
             <img src={hide} className='w-5 invert self-end absolute' onClick={() => toggalpwd(pwdRef2, imgRef2)} ref={imgRef2} />
             {errors['confirm password'] && <span className='text-red-500 text-xs'>{errors['confirm password'].message}</span>}
           </div>
