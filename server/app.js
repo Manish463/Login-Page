@@ -18,7 +18,6 @@ let db = mongoose.connection
 const app = express()
 app.use(bodyParser.json())
 app.use(cors())
-const port = 3000
 
 app.get('/', async (req, res) => {
     res.send('Hello World!')
@@ -54,6 +53,4 @@ app.post('/login', async (req, res) => {
     }
 })
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+export default app
