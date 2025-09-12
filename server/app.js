@@ -5,8 +5,9 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import { User } from './models/user.js'
 
+let port = process.env.conString || 3000
 dotenv.config()
-mongoose.connect(process.env.conString)
+mongoose.connect(port)
     .then(() => {
         console.log("Successfully connected");
     })
@@ -37,25 +38,20 @@ app.post('/signup', async (req, res) => {
     }
 })
 
-// app.post('/login', async (req, res) => {
-//     let data = req.body
+app.post('/login', async (req, res) => {
+    let data = req.body
 
-//     let emailFound = await db.collection('users').findOne({ email: data.email })
-//     let passwordFound = await db.collection('users').findOne({ password: data.password })
+    let result = await db.collection('users').findOne({ $and: [{ email: data.email }, { password: data.password }] })
 
-//     if (emailFound) {
-//         if (passwordFound) {
-//             return res.send(emailFound);
-//         } else {
-//             return res.status(400).send('Invalid password!');
-//         }
-//     } else {
-//         return res.status(400).send('Invalid email!');
-//     }
-// })
-
-// app.listen(process.env.PORT || 3000, () => {
-//     console.log(`Server is running on port ${process.env.PORT}`);
-// })
+    if (result.length > 0) {
+        if (result[0].password === data.password) {
+            return res.send(emailFound);
+        } else {
+            return res.status(400).send('Invalid password!');
+        }
+    } else {
+        return res.status(400).send('Invalid email!');
+    }
+})
 
 export default app
