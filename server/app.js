@@ -41,7 +41,7 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
     let data = req.body
 
-    let result = await db.collection('users').findOne({ $and: [{ email: data.email }, { password: data.password }] })
+    let result = await User.find({ $and: [{ email: data.email }, { password: data.password }] })
 
     if (result.length > 0) {
         if (result[0].password === data.password) {
