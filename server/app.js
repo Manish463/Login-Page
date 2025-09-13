@@ -25,32 +25,27 @@ app.get('/', (req, res) => {
 
 app.post('/signup', async (req, res) => {
     let data = req.body
-    let isPresent = await User.find({ email: data.email })
+    let isPresent = await User.findOne({ email: data.email })
     try {
-        if (isPresent.length > 0) {
+        if (isPresent) {
             res.status(400).send('Email already exists!')
         } else {
             let newDoc = await User.create({ username: data.username, email: data.email, password: data.password })
-            res.send(newDoc)
+            res.status(200).send(newDoc)
         }
     } catch (error) {
         res.status(500).json({error: error.message})
     }
 })
 
-app.get('/login', async (req, res) => {
+app.post('/login', async (req, res) => {
     let data = req.body
 
-    let result = await User.find({ $and: [{ email: data.email }, { password: data.password }] })
-    // res.send(result)
-    if (result.length > 0) {
-        if (result[0].password === data.password) {
-            res.send(result[0]);
-        } else {
-            res.status(400).send('Invalid password!');
-        }
+    let result = await User.findOne({ $and: [{ email: data.email }, { password: data.password }] })
+    if (result) {
+    res.send(result);
     } else {
-        res.status(400).send('Invalid email!');
+        res.status(401).send("Invalid email or password!");
     }
 })
 
