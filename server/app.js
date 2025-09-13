@@ -6,7 +6,7 @@ import dotenv from 'dotenv'
 import { User } from './models/user.js'
 
 dotenv.config()
-let port = process.env.port || 3000
+let port = process.env.PORT || 3000
 let uri = process.env.conString
 mongoose.connect(uri)
     .then(() => {
@@ -20,8 +20,8 @@ const app = express()
 app.use(bodyParser.json())
 app.use(cors())
 
-app.get('/', async (req, res) => {
-    res.send('Hello World!')
+app.get('/', (req, res) => {
+    res.send('<h1>Hello World!</h1>')
 })
 
 app.post('/signup', async (req, res) => {
@@ -32,10 +32,10 @@ app.post('/signup', async (req, res) => {
             res.status(400).send('Email already exists!')
         } else {
             let newDoc = await User.create({ username: data.username, email: data.email, password: data.password })
-            res.send(newDoc);
+            res.send(newDoc)
         }
     } catch (error) {
-        res.status(500).json({message: 'Internal Server Error', error: error.message})
+        res.status(500).json({error: error.message})
     }
 })
 
@@ -46,12 +46,12 @@ app.get('/login', async (req, res) => {
     // res.send(result)
     if (result.length > 0) {
         if (result[0].password === data.password) {
-            return res.send(result[0]);
+            res.send(result[0]);
         } else {
-            return res.status(400).send('Invalid password!');
+            res.status(400).send('Invalid password!');
         }
     } else {
-        return res.status(400).send('Invalid email!');
+        res.status(400).send('Invalid email!');
     }
 })
 
