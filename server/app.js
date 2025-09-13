@@ -5,9 +5,10 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import { User } from './models/user.js'
 
-let port = process.env.conString || 3000
 dotenv.config()
-mongoose.connect(port)
+let port = process.env.port || 3000
+let uri = process.env.conString
+mongoose.connect(uri)
     .then(() => {
         console.log("Successfully connected");
     })
@@ -38,14 +39,14 @@ app.post('/signup', async (req, res) => {
     }
 })
 
-app.post('/login', async (req, res) => {
+app.get('/login', async (req, res) => {
     let data = req.body
 
     let result = await User.find({ $and: [{ email: data.email }, { password: data.password }] })
-
+    // res.send(result)
     if (result.length > 0) {
         if (result[0].password === data.password) {
-            return res.send(emailFound);
+            return res.send(result[0]);
         } else {
             return res.status(400).send('Invalid password!');
         }
@@ -53,5 +54,9 @@ app.post('/login', async (req, res) => {
         return res.status(400).send('Invalid email!');
     }
 })
+
+// app.listen(port, () => {
+//     console.log(port)
+// })
 
 export default app
