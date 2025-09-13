@@ -6,7 +6,6 @@ import dotenv from 'dotenv'
 import { User } from './models/user.js'
 
 dotenv.config()
-let port = process.env.PORT || 3000
 let uri = process.env.conString
 mongoose.connect(uri)
     .then(() => {
@@ -54,9 +53,5 @@ app.get('/login', async (req, res) => {
         res.status(400).send('Invalid email!');
     }
 })
-
-// app.listen(port, () => {
-//     console.log(port)
-// })
 
 export default app
