@@ -1,6 +1,6 @@
-import { useForm } from 'react-hook-form'
+import { set, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { useRef } from 'react'
+import { useState, useRef } from 'react'
 import emailsvg from '../assets/email.svg'
 import show from '../assets/show.svg'
 import hide from '../assets/hide.svg'
@@ -8,10 +8,10 @@ import { useNavigate } from 'react-router-dom'
 
 const Login = ({sendResponse}) => {
   const navigate = useNavigate()
-  const inputRef1 = useRef(null)
-  const inputRef2 = useRef(null)
-  const pwdRef1 = useRef(null)
-  const imgRef1 = useRef(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isPwdShow, setIsPwdShow] = useState(false)
+  const [isIconShow, setIsIconShow] = useState(hide)
+  const [focusState, setFocusState] = useState({first: false, second: false})
 
   const {
     register,
@@ -21,7 +21,8 @@ const Login = ({sendResponse}) => {
   } = useForm()
 
   const onSubmit = async (data) => {
-    let response = await fetch('http://localhost:3000/login', {
+    setIsSubmitting(true)
+    let response = await fetch('https://login-page-server-side.vercel.app/login', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -29,32 +30,20 @@ const Login = ({sendResponse}) => {
       body: JSON.stringify(data),
     })
     
-    if(response.status === 400) {
+    if(response.status === 401) {
       let res = await response.text()
-      if(res == "Invalid email!")
-        setError('email', {message: res})
-      setError('password', {message: "Invalid password!"})
-      if(res == "Invalid password!")
-        setError('password', {message: res})
+      setError('email', {message: res})
     } else {
       let res = await response.json()
       sendResponse(res)
       navigate("/")
     }
+    setIsSubmitting(false)
   }
 
-  const shiftlabel = (word) => {
-    word.current.classList.add('-translate-y-4', 'text-sm', 'text-gray-300')
-  }
-
-  const toggalpwd = (pwdRef, imgRef) => {
-    if (pwdRef.current.type === 'password') {
-      pwdRef.current.type = 'text'
-      imgRef.current.src = show
-    } else {
-      pwdRef.current.type = 'password'
-      imgRef.current.src = hide
-    }
+  const toggalpwd = () => {
+    setIsPwdShow(!isPwdShow)
+    isPwdShow ? setIsIconShow(hide) : setIsIconShow(show)
   }
 
   return (
@@ -69,22 +58,22 @@ const Login = ({sendResponse}) => {
         <div className='flex flex-col gap-5 w-full'>
 
           <div className='flex flex-col m-0'>
-            <label htmlFor="email" className='absolute' ref={inputRef1}>Email</label>
-            <input id='email' type="email" {...register("email", { required: { value: true, message: "Fill this area first" } })} className='w-full border-b-2 outline-0' onClick={() => shiftlabel(inputRef1)} />
+            <label htmlFor="email" className={`absolute  ${focusState.first ? "-translate-y-4 text-sm text-gray-300" : "translate-y-0 text-md text-white"}`}>Email</label>
+            <input id='email' type="email" {...register("email", { required: { value: true, message: "Fill this area first" } })} className='w-full border-b-2 outline-0' onFocus={()=>setFocusState({...focusState, first: true})} onBlur={(e)=>setFocusState({...focusState, first: e.target.value !== ""})}/>
             <img src={emailsvg} className='w-5 invert self-end absolute' />
             {errors.email && <span className='text-red-500 text-xs'>{errors.email.message}</span>}
           </div>
 
           <div className='flex flex-col m-0'>
-            <label htmlFor="pwd" className='absolute' ref={inputRef2}>Password</label>
-            <input id='pwd' type="password" {...register("password", { required: { value: true, message: "Fill this area first" } })} className='w-full border-b-2 outline-0' onClick={() => shiftlabel(inputRef2)} ref={(e) => { register("password").ref(e); pwdRef1.current = e; }} />
-            <img src={hide} className='w-5 invert self-end absolute' onClick={() => toggalpwd(pwdRef1, imgRef1)} ref={imgRef1} />
+            <label htmlFor="pwd" className={`absolute  ${focusState.second ? "-translate-y-4 text-sm text-gray-300" : "translate-y-0 text-md text-white"}`}>Password</label>
+            <input id='pwd' type={isPwdShow ? "text" : "password"} {...register("password", { required: { value: true, message: "Fill this area first" } })} className='w-full border-b-2 outline-0' onFocus={()=>setFocusState({...focusState, second: true})} onBlur={(e)=>setFocusState({...focusState, second: e.target.value !== ""})} />
+            <img src={isIconShow} className='w-5 invert self-end absolute' onClick={() => toggalpwd()} />
             {errors.password && <span className='text-red-500 text-xs'>{errors.password.message}</span>}
           </div>
 
         </div>
 
-        <input type="submit" value="Log In" className='w-full p-2 rounded-lg text-lg text-white bg-blue-500' />
+        <input type="submit" value={isSubmitting ? "Submitting" : "Log In"} className='w-full p-2 rounded-lg text-lg text-white bg-blue-500' />
       </form>
     </>
   )
