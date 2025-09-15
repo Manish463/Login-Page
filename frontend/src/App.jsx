@@ -19,7 +19,7 @@ function App() {
 
   const fetchData = async () => {
     let jwt = localStorage.getItem('token');
-    let response = await fetch('http://localhost:3000/', {
+    let response = await fetch('https://login-page-server-side.vercel.app/', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
