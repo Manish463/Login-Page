@@ -41,8 +41,9 @@ function Signup({sendResponse}) {
     if(response.status === 400) {
       setError('email', {message: 'Email already exists!'})
     } else {
-      let res = await response.json()
-      sendResponse(res)
+      let { result, token } = await response.json()
+      localStorage.setItem('token', token)
+      sendResponse(result)
       navigate("/")
     }
     setIsSubmitting(false)

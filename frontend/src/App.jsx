@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './components/Home'
@@ -12,9 +12,32 @@ import { userdataContext } from './context/context'
 
 function App() {
   const [userData, setuserData] = useState(0)
+
   const handleResponse = (data) => {
-    setuserData({data})
+    setuserData(data)
   }
+
+  const fetchData = async () => {
+    let jwt = localStorage.getItem('token');
+    let response = await fetch('http://localhost:3000/', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ token: jwt }), // wrap in object
+    });
+
+    if (response.status === 200) {
+      let data = await response.json();
+      setuserData(data);
+    } else {
+      setuserData(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const router = createBrowserRouter([
     {
@@ -45,7 +68,7 @@ function App() {
 
   return (
     <>
-      <userdataContext.Provider value={ userData } >
+      <userdataContext.Provider value={userData} >
         <div className="container w-full flex justify-center items-center h-screen m-0 p-0 box-border bg-black text-white">
           <RouterProvider router={router} />
         </div>

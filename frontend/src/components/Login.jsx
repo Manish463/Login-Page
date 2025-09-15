@@ -1,4 +1,4 @@
-import { set, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { useState, useRef } from 'react'
 import emailsvg from '../assets/email.svg'
@@ -34,8 +34,9 @@ const Login = ({sendResponse}) => {
       let res = await response.text()
       setError('email', {message: res})
     } else {
-      let res = await response.json()
-      sendResponse(res)
+      let { result, token } = await response.json()
+      localStorage.setItem('token', token)
+      sendResponse(result)
       navigate("/")
     }
     setIsSubmitting(false)
