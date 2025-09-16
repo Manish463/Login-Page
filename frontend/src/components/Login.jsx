@@ -22,13 +22,17 @@ const Login = ({sendResponse}) => {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true)
-    let response = await fetch('https://login-page-server-side.vercel.app/login', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
+    try {
+      let response = await fetch('https://login-page-server-side.vercel.app/login', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+    } catch (error) {
+      console.log("Error to fetch data from /login to login page", error);
+    }
     
     if(response.status === 401) {
       let res = await response.text()
