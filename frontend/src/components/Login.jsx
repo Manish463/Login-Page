@@ -32,9 +32,11 @@ const Login = ({sendResponse}) => {
     console.log(response);
     if(response.status === 401) {
       let res = await response.text()
+      console.log(res);
       setError('email', {message: res})
     } else {
       let { result, token } = await response.json()
+      console.log(result, token);
       localStorage.setItem('token', token)
       sendResponse(result)
       navigate("/")
