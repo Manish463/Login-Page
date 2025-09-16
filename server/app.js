@@ -56,10 +56,19 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
     let data = req.body
 
-    let result = await User.findOne({ $and: [{ email: data.email }, { password: data.password }] })
+    try {
+        let result = await User.findOne({ $and: [{ email: data.email }, { password: data.password }] })
+    } catch (error) {
+        res.status(500).json({"Error to fetch data from db to server": error})
+    }
+    
     if (result) {
         const payload = { id: result._id, email: result.email }
-        const token = jwt.sign(payload, KEY, { expiresIn: '1h' })
+        try {
+            const token = jwt.sign(payload, KEY, { expiresIn: '1h' })
+        } catch (error) {
+            res.status(500).json({"Error to create token": error})
+        }
         res.status(200).json({ result: result, token: token })
     } else {
         res.status(401).send("Invalid email or password!");
