@@ -48,7 +48,7 @@ const Login = ({sendResponse}) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="box-border fram flex flex-col min-h-[400px] w-[330px] p-3 px-8 justify-evenly rounded-xl items-center border border-gray-400 backdrop-blur-sm bg-black/30 shadow-md shadow-gray-600 text-white">
+      <form onSubmit={handleSubmit(onSubmit)} className="box-border fram flex flex-col min-h-[23em] w-[18em] md:w-[20em] m-3 p-3 px-8 justify-evenly rounded-xl items-center border border-gray-400 backdrop-blur-sm bg-black/30 shadow-md shadow-gray-600 text-white">
 
         <div className='flex flex-col gap-3 items-center'>
           <h1 className='text-4xl font-semibold'>Log In</h1>

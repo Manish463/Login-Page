@@ -6,7 +6,7 @@ const Profile = () => {
     const userData = useContext(userdataContext)
 
     return (
-        <div className="box-border flex flex-col p-3 px-8 justify-center rounded-xl items-center border border-gray-400 backdrop-blur-sm bg-black/30 shadow-md shadow-gray-600 text-white">
+        <div className="box-border flex flex-col p-3 px-8 m-3 justify-center rounded-xl items-center border border-gray-400 backdrop-blur-sm bg-black/30 shadow-md shadow-gray-600 text-white">
             <div>
                 <p>Hello, <i>{userData.username}</i></p>
                 <br />

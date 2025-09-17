@@ -69,7 +69,7 @@ function App() {
   return (
     <>
       <userdataContext.Provider value={userData} >
-        <div className="container w-full flex justify-center items-center h-screen m-0 p-0 box-border bg-black text-white">
+        <div className="container w-full flex justify-center items-center h-screen m-0 p-0 box-border bg-black text-white bg-[url('images/background2.jpg')] bg-cover bg-center bg-no-repeat">
           <RouterProvider router={router} />
         </div>
       </userdataContext.Provider>
